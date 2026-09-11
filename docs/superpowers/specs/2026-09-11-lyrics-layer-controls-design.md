@@ -151,13 +151,16 @@ var attr: [CFAttributedString.Key: Any] = [.ctRubySizeFactor: factor]
 
 ## 测试
 
-`LyricsXPackage` 有个空的 `LyricsXFoundationTests` 目标，但 Xcode scheme 未配置测试，跑不起来。四层渲染逻辑也都耦合在 `NSView` 子类里，单元测试需要先做一轮解耦 —— 超出本次范围。
+Xcode scheme 没配测试，但 `swift test --package-path LyricsXPackage` 可以跑（swift-testing 已就绪，实测通过）。所以两块纯逻辑写单元测试：字号钳制、歌词窗口的注音行/罗马音行文本生成 —— 它们不依赖 AppKit，可以放进 `LyricsXFoundation` 包。
+
+四层渲染本身耦合在 `NSView` 子类里，无法在包测试中实例化，那部分靠构建 + 手动验证。
 
 验证方式：
 
-1. `xcodebuild -project LyricsX.xcodeproj -scheme LyricsX -configuration Debug build` 通过。
-2. `swiftlint` 无新增告警。
-3. 手动验证：放一首日文歌（有翻译），逐个切换 8 个开关、调整 8 个字号，确认桌面歌词与歌词窗口各自独立生效；确认卡拉OK进度动画在原文显示时正常、隐藏时不崩；确认非中文翻译在歌词窗口里显示；确认从旧版本升级后原有的注音/罗马音/双语设置被正确迁移。
+1. `swift test --package-path LyricsXPackage` 通过。
+2. `xcodebuild -project LyricsX.xcodeproj -scheme LyricsX -configuration Debug build` 通过。
+3. `swiftlint` 无新增告警。
+4. 手动验证：放一首日文歌（有翻译），逐个切换 8 个开关、调整 8 个字号，确认桌面歌词与歌词窗口各自独立生效；确认卡拉OK进度动画在原文显示时正常、隐藏时不崩；确认非中文翻译在歌词窗口里显示；确认从旧版本升级后原有的注音/罗马音/双语设置被正确迁移。
 
 手动验证这条得由你来做 —— 我无法在这个环境里观察菜单栏应用的实际渲染效果。
 

@@ -20,8 +20,6 @@
 	<true/>
 	<key>DesktopLyricsShowRomaji</key>
 	<false/>
-	<key>DesktopLyricsShowTranslation</key>
-	<true/>
 	<key>DesktopLyricsFuriganaFontSize</key>
 	<integer>12</integer>
 	<key>DesktopLyricsRomajiFontSize</key>
@@ -34,8 +32,6 @@
 	<true/>
 	<key>LyricsWindowShowRomaji</key>
 	<false/>
-	<key>LyricsWindowShowTranslation</key>
-	<true/>
 	<key>LyricsWindowFuriganaFontSize</key>
 	<integer>9</integer>
 	<key>LyricsWindowRomajiFontSize</key>

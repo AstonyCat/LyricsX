@@ -70,15 +70,15 @@ final class UserDefaultsMigrator {
         }
     }
 
-    /// 把旧的单开关设置迁到分层设置。旧键只在用户显式设过时才有值，
-    /// 没设过就让新键保持 plist 注册的默认值。
+    /// 把旧的单开关设置迁到分层设置。只有用户显式设置过的旧值才迁移，
+    /// 没设过就让新键保持注册的默认值——翻译开关的默认值由
+    /// `AppDelegate.registerUserDefaults()` 按系统语言推导，与旧版行为一致。
     func migrateLyricsLayerSettingsIfNeeded() {
         guard !userDefaults.bool(forKey: Self.layerSettingsCompletionKey) else { return }
 
         let moves: [(old: String, new: [String])] = [
             ("DesktopLyricsEnableFurigana", ["DesktopLyricsShowFurigana"]),
             ("DesktopLyricsEnableRomajin", ["DesktopLyricsShowRomaji"]),
-            ("PreferBilingualLyrics", ["DesktopLyricsShowTranslation", "LyricsWindowShowTranslation"]),
         ]
 
         var migratedCount = 0
@@ -90,6 +90,15 @@ final class UserDefaultsMigrator {
             }
         }
 
+        // `PreferBilingualLyrics` 曾经注册过按系统语言推导的默认值，`object(forKey:)`
+        // 会把注册值当成用户选择读出来，所以这里只认持久域里的值；
+        // `register(defaults:)` 从不写入持久域，读到了就一定是用户显式设置。
+        let persistent = userDefaults.persistentDomain(forName: bundleIdentifier) ?? [:]
+        if let preferBilingual = persistent["PreferBilingualLyrics"] as? Bool {
+            userDefaults.set(preferBilingual, forKey: "DesktopLyricsShowTranslation")
+            userDefaults.set(preferBilingual, forKey: "LyricsWindowShowTranslation")
+            migratedCount += 2
+        }
         userDefaults.set(true, forKey: Self.layerSettingsCompletionKey)
         #log(.info, "Migrated \(migratedCount, privacy: .public) lyrics layer settings from legacy keys")
     }

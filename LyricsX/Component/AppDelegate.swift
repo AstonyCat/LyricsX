@@ -274,6 +274,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
             .lyricsWindowTextColor: #colorLiteral(red: 0.7540688515, green: 0.7540867925, blue: 0.7540771365, alpha: 1),
             .lyricsWindowHighlightColor: #colorLiteral(red: 0.8866666667, green: 1, blue: 0.8, alpha: 1),
             .chineseConversionIndex: isHant ? 2 : 0,
+            .desktopLyricsShowTranslation: isZh,
+            .lyricsWindowShowTranslation: isZh,
             .desktopLyricsXPositionFactor: 0.5,
             .desktopLyricsYPositionFactor: 0.9,
         ])

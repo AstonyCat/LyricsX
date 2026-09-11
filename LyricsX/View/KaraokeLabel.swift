@@ -25,6 +25,20 @@ class KaraokeLabel: NSTextField {
         }
     }
 
+    @objc dynamic var furiganaFontSize: CGFloat = 12 {
+        didSet {
+            clearCache()
+            invalidateIntrinsicContentSize()
+        }
+    }
+
+    @objc dynamic var romajiFontSize: CGFloat = 8 {
+        didSet {
+            clearCache()
+            invalidateIntrinsicContentSize()
+        }
+    }
+
     override var attributedStringValue: NSAttributedString {
         didSet {
             clearCache()
@@ -81,7 +95,8 @@ class KaraokeLabel: NSTextField {
             }
             guard shouldDrawFurigana else { continue }
             if let (furigana, range) = tokenizer.currentFuriganaAnnotation(in: string) {
-                var attr: [CFAttributedString.Key: Any] = [.ctRubySizeFactor: 0.5]
+                let rubySizeFactor = furiganaFontSize / (font?.pointSize ?? 24)
+                var attr: [CFAttributedString.Key: Any] = [.ctRubySizeFactor: rubySizeFactor]
                 attr[.ctForegroundColor] = textColor
                 let annotation = CTRubyAnnotation.create(furigana, attributes: attr)
                 attrString.addAttribute(.cf(.ctRubyAnnotation), value: annotation, range: range)
@@ -281,7 +296,7 @@ class KaraokeLabel: NSTextField {
                         )
 
                         let fontSize = font?.pointSize ?? 24
-                        var rubyFontSize = fontSize * 0.3
+                        var rubyFontSize = romajiFontSize
                         let rubyFontBase = NSFont.systemFont(ofSize: rubyFontSize)
                         let rubyAttrBase: [NSAttributedString.Key: Any] = [
                             .foregroundColor: textColor ?? .black,
@@ -340,7 +355,7 @@ class KaraokeLabel: NSTextField {
                 )
 
                 let fontSize = font?.pointSize ?? 24
-                var rubyFontSize = fontSize * 0.3
+                var rubyFontSize = romajiFontSize
                 let rubyAttrBase: [NSAttributedString.Key: Any] = [
                     .foregroundColor: textColor ?? .black,
                 ]

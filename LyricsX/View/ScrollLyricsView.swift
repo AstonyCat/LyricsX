@@ -47,12 +47,48 @@ class ScrollLyricsView: NSScrollView {
         didSet { updateFont() }
     }
 
+    @objc dynamic var showFurigana = false {
+        didSet { rebuildContents() }
+    }
+
+    @objc dynamic var showOriginal = true {
+        didSet { rebuildContents() }
+    }
+
+    @objc dynamic var showRomaji = false {
+        didSet { rebuildContents() }
+    }
+
+    @objc dynamic var showTranslation = true {
+        didSet { rebuildContents() }
+    }
+
+    @objc dynamic var furiganaFontSize: CGFloat = 9 {
+        didSet { updateFont() }
+    }
+
+    @objc dynamic var romajiFontSize: CGFloat = 7 {
+        didSet { updateFont() }
+    }
+
+    @objc dynamic var translationFontSize: CGFloat = 11 {
+        didSet { updateFont() }
+    }
+
+    private enum LyricsLineRole {
+        case furigana, original, romaji, translation
+    }
+
     private var ranges: [(TimeInterval, NSRange)] = []
+    private var roleRanges: [(LyricsLineRole, NSRange)] = []
     private var highlightedRange: NSRange?
+    private var currentLyrics: Lyrics?
 
     func setupTextContents(lyrics: Lyrics?) {
+        currentLyrics = lyrics
         guard let lyrics = lyrics else {
             ranges = []
+            roleRanges = []
             textView.string = ""
             highlightedRange = nil
             return
@@ -60,39 +96,64 @@ class ScrollLyricsView: NSScrollView {
 
         var lrcContent = ""
         var newRanges: [(TimeInterval, NSRange)] = []
+        var newRoleRanges: [(LyricsLineRole, NSRange)] = []
         let enabledLrc = lyrics.lines.filter { $0.enabled && !$0.content.isEmpty }
         let languageCode = lyrics.metadata.translationLanguages.first
 
         for line in enabledLrc {
-            var lineStr = line.content
-            if var trans = line.attachments[.translation(languageCode: languageCode)], defaults[.preferBilingualLyrics],
-               languageCode?.hasPrefix("zh") == true {
-                if let converter = ChineseConverter.shared {
+            let lineStart = lrcContent.utf16.count
+            var pieces: [(LyricsLineRole, String)] = []
+
+            let annotations = (showFurigana || showRomaji) ? lyricsAnnotationLines(for: line.content) : .empty
+            if showFurigana, !annotations.furigana.isEmpty {
+                pieces.append((.furigana, annotations.furigana))
+            }
+            if showOriginal {
+                pieces.append((.original, line.content))
+            }
+            if showRomaji, !annotations.romaji.isEmpty {
+                pieces.append((.romaji, annotations.romaji))
+            }
+            if showTranslation, var trans = line.attachments[.translation(languageCode: languageCode)] {
+                if languageCode?.hasPrefix("zh") == true, let converter = ChineseConverter.shared {
                     trans = converter.convert(trans)
                 }
-                lineStr += "\n" + trans
+                pieces.append((.translation, trans))
             }
-            let range = NSRange(location: lrcContent.utf16.count, length: lineStr.utf16.count)
-            newRanges.append((line.position, range))
-            lrcContent += lineStr
+
+            for (offset, piece) in pieces.enumerated() {
+                if offset > 0 {
+                    lrcContent += "\n"
+                }
+                let start = lrcContent.utf16.count
+                lrcContent += piece.1
+                newRoleRanges.append((piece.0, NSRange(location: start, length: piece.1.utf16.count)))
+            }
+
+            // 整句范围覆盖它的所有可见行，高亮/滚动/双击定位据此工作。
+            newRanges.append((line.position, NSRange(location: lineStart, length: lrcContent.utf16.count - lineStart)))
             if line != enabledLrc.last {
                 lrcContent += "\n\n"
             }
         }
         ranges = newRanges
+        roleRanges = newRoleRanges
         textView.string = lrcContent
         highlightedRange = nil
-        let range = textView.string.fullRange
-        let font = NSFont(name: fontName, size: fontSize)!
+
         let style = NSMutableParagraphStyle().with {
             $0.alignment = .center
         }
         textView.textStorage?.addAttributes([
             .foregroundColor: textColor,
             .paragraphStyle: style,
-            .font: font,
-        ], range: range)
+        ], range: textView.string.fullRange)
+        applyFonts()
         needsLayout = true
+    }
+
+    private func rebuildContents() {
+        setupTextContents(lyrics: currentLyrics)
     }
 
     override func layout() {
@@ -211,8 +272,21 @@ class ScrollLyricsView: NSScrollView {
     }
 
     func updateFont() {
-        let range = textView.string.fullRange
-        guard let font = NSFont(name: fontName, size: fontSize) else { return }
-        textView.textStorage?.addAttribute(.font, value: font, range: range)
+        applyFonts()
+    }
+
+    private func applyFonts() {
+        guard let textStorage = textView.textStorage else { return }
+        for (role, range) in roleRanges {
+            let size: CGFloat
+            switch role {
+            case .furigana: size = furiganaFontSize
+            case .original: size = fontSize
+            case .romaji: size = romajiFontSize
+            case .translation: size = translationFontSize
+            }
+            guard let font = NSFont(name: fontName, size: size) ?? NSFont(name: "Helvetica", size: size) else { continue }
+            textStorage.addAttribute(.font, value: font, range: range)
+        }
     }
 }

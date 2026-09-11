@@ -19,6 +19,7 @@ final class UserDefaultsMigrator {
     static let shared = UserDefaultsMigrator()
 
     private static let migrationCompletionKey = "Migration.SandboxToNonSandbox.v1"
+    private static let layerSettingsCompletionKey = "Migration.LyricsLayerSettings.v1"
 
     private let bundleIdentifier: String
     private let userDefaults: UserDefaults
@@ -67,6 +68,30 @@ final class UserDefaultsMigrator {
         } catch {
             #log(.error, "Migration failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// 把旧的单开关设置迁到分层设置。旧键只在用户显式设过时才有值，
+    /// 没设过就让新键保持 plist 注册的默认值。
+    func migrateLyricsLayerSettingsIfNeeded() {
+        guard !userDefaults.bool(forKey: Self.layerSettingsCompletionKey) else { return }
+
+        let moves: [(old: String, new: [String])] = [
+            ("DesktopLyricsEnableFurigana", ["DesktopLyricsShowFurigana"]),
+            ("DesktopLyricsEnableRomajin", ["DesktopLyricsShowRomaji"]),
+            ("PreferBilingualLyrics", ["DesktopLyricsShowTranslation", "LyricsWindowShowTranslation"]),
+        ]
+
+        var migratedCount = 0
+        for (old, newKeys) in moves {
+            guard let value = userDefaults.object(forKey: old) as? Bool else { continue }
+            for newKey in newKeys {
+                userDefaults.set(value, forKey: newKey)
+                migratedCount += 1
+            }
+        }
+
+        userDefaults.set(true, forKey: Self.layerSettingsCompletionKey)
+        #log(.info, "Migrated \(migratedCount, privacy: .public) lyrics layer settings from legacy keys")
     }
 
     private var sandboxContainerPlistURL: URL {

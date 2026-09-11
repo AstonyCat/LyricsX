@@ -31,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation, NSMenu
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         UserDefaultsMigrator.shared.migrateFromSandboxIfNeeded()
         registerUserDefaults()
+        UserDefaultsMigrator.shared.migrateLyricsLayerSettingsIfNeeded()
 
         let controller = AppController.shared
 

@@ -66,6 +66,21 @@ class LyricsHUDViewController: NSViewController, NSWindowDelegate, ScrollLyricsV
             self.lyricsScrollView.furiganaFontSize = defaults.windowFuriganaSize
             self.lyricsScrollView.romajiFontSize = defaults.windowRomajiSize
             self.lyricsScrollView.translationFontSize = defaults.windowTranslationSize
+            self.displayLyrics(animation: false)
+        }
+
+        // 开关翻转会让视图整体重建文本并清掉高亮；绑定与本观察者监听同一个键，
+        // 异步等重建先落定后再重申高亮与滚动位置，避免暂停时停在过期视口。
+        observeDefaults(keys: [
+            .lyricsWindowShowFurigana,
+            .lyricsWindowShowOriginal,
+            .lyricsWindowShowRomaji,
+            .lyricsWindowShowTranslation,
+        ]) { [weak self] in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.displayLyrics(animation: false)
+            }
         }
 
         AppController.shared.$currentLyrics

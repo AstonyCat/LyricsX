@@ -277,6 +277,12 @@ class ScrollLyricsView: NSScrollView {
 
     private func applyFonts() {
         guard let textStorage = textView.textStorage else { return }
+        // 行与行、句与句之间的换行不属于任何 role 区间，若不先铺一层基础字体，
+        // 它们会一直留着 storyboard 的字体，让空行间距不随用户字号缩放。
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        if let baseFont = NSFont(name: fontName, size: fontSize) ?? NSFont(name: "Helvetica", size: fontSize) {
+            textStorage.addAttribute(.font, value: baseFont, range: fullRange)
+        }
         for (role, range) in roleRanges {
             let size: CGFloat
             switch role {

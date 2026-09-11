@@ -91,7 +91,6 @@ extension UserDefaults.DefaultsKeys {
     static let selectedLanguage = Key<String?>("SelectedLanguage")
 
     static let strictSearchEnabled = Key<Bool>("StrictSearchEnabled")
-    static let preferBilingualLyrics = Key<Bool>("PreferBilingualLyrics")
     static let chineseConversionIndex = Key<Int>("ChineseConversionIndex")
 
     static let combinedMenubarLyrics = Key<Bool>("CombinedMenubarLyrics")
@@ -109,9 +108,6 @@ extension UserDefaults.DefaultsKeys {
 
     static let desktopLyricsXPositionFactor = Key<CGFloat>("DesktopLyricsXPositionFactor")
     static let desktopLyricsYPositionFactor = Key<CGFloat>("DesktopLyricsYPositionFactor")
-
-    static let desktopLyricsEnableFurigana = Key<Bool>("DesktopLyricsEnableFurigana")
-    static let desktopLyricsEnableRomajin = Key<Bool>("DesktopLyricsEnableRomajin")
 
     static let desktopLyricsShowFurigana = Key<Bool>("DesktopLyricsShowFurigana")
     static let desktopLyricsShowOriginal = Key<Bool>("DesktopLyricsShowOriginal")

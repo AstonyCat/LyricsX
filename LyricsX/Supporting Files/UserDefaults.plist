@@ -14,8 +14,6 @@
 	<true/>
 	<key>DesktopLyricsInsetBottom</key>
 	<integer>20</integer>
-	<key>DesktopLyricsEnableFurigana</key>
-	<false/>
 	<key>DesktopLyricsShowFurigana</key>
 	<false/>
 	<key>DesktopLyricsShowOriginal</key>

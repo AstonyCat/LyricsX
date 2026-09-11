@@ -50,7 +50,13 @@ class KaraokeLyricsWindowController: NSWindowController {
                 .receive(on: DispatchQueue.lyricsDisplay)
                 .invoke(KaraokeLyricsWindowController.handleLyricsDisplay, weaklyOn: self)
                 .store(in: &self.cancelBag)
-            defaults.publisher(for: [.desktopLyricsShowTranslation, .desktopLyricsOneLineMode])
+            defaults.publisher(for: [
+                .desktopLyricsShowFurigana,
+                .desktopLyricsShowOriginal,
+                .desktopLyricsShowRomaji,
+                .desktopLyricsShowTranslation,
+                .desktopLyricsOneLineMode,
+            ])
                 .prepend()
                 .invoke(KaraokeLyricsWindowController.handleLyricsDisplay, weaklyOn: self)
                 .store(in: &self.cancelBag)

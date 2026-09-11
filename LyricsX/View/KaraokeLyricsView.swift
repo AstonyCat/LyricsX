@@ -135,6 +135,9 @@ class KaraokeLyricsView: NSView {
             isHidden = shouldHideAll
             layoutSubtreeIfNeeded()
         }, completionHandler: {
+            if let line1 = self.displayLine1, !line1.hasVisibleContent, self.displayLine2 == nil {
+                self.isHidden = true
+            }
             self.mouseTest()
         })
     }

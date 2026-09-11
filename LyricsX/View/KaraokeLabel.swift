@@ -39,6 +39,24 @@ class KaraokeLabel: NSTextField {
         }
     }
 
+    @objc dynamic var drawOriginal = true {
+        didSet {
+            clearCache()
+            invalidateIntrinsicContentSize()
+        }
+    }
+
+    /// 原文被隐藏且罗马音开启时，罗马音替代原文单独成行。
+    /// 此模式下没有原文字形，卡拉OK进度动画无处可画。
+    var isDrawingRomajiInline: Bool {
+        !drawOriginal && drawRomajin
+    }
+
+    /// 四层全关时没有任何可绘制内容，视图层据此整体隐藏。
+    var hasVisibleContent: Bool {
+        drawOriginal || (drawRomajin && !romajinAnnotations.isEmpty)
+    }
+
     override var attributedStringValue: NSAttributedString {
         didSet {
             clearCache()
@@ -80,12 +98,13 @@ class KaraokeLabel: NSTextField {
         }
         let attrString = NSMutableAttributedString(attributedString: attributedStringValue)
         let string = attrString.string as NSString
-        let shouldDrawFurigana = drawFurigana && string.dominantLanguage == "ja"
+        // 原文隐藏时注音失去宿主字形，只能一起消失。
+        let shouldDrawFurigana = drawFurigana && drawOriginal && string.dominantLanguage == "ja"
         let shouldDrawRomajin = drawRomajin && string.dominantLanguage == "ja"
         let tokenizer = CFStringTokenizer.create(string: .from(string))
         romajinAnnotations = []
         for tokenType in IteratorSequence(tokenizer) where tokenType.contains(.isCJWordMask) {
-            if isVertical {
+            if isVertical, drawOriginal {
                 let tokenRange = tokenizer.currentTokenRange()
                 let attr: [NSAttributedString.Key: Any] = [
                     .verticalGlyphForm: true,
@@ -93,21 +112,32 @@ class KaraokeLabel: NSTextField {
                 ]
                 attrString.addAttributes(attr, range: tokenRange.asNS)
             }
+            if shouldDrawRomajin, let (romajin, range) = tokenizer.currentRomanjiAnnotation(in: string) {
+                romajinAnnotations.append((romajin as String, range))
+            }
             guard shouldDrawFurigana else { continue }
             if let (furigana, range) = tokenizer.currentFuriganaAnnotation(in: string) {
-                let rubySizeFactor = furiganaFontSize / (font?.pointSize ?? 24)
-                var attr: [CFAttributedString.Key: Any] = [.ctRubySizeFactor: rubySizeFactor]
+                var attr: [CFAttributedString.Key: Any] = [.ctRubySizeFactor: furiganaFontSize / (font?.pointSize ?? 24)]
                 attr[.ctForegroundColor] = textColor
                 let annotation = CTRubyAnnotation.create(furigana, attributes: attr)
                 attrString.addAttribute(.cf(.ctRubyAnnotation), value: annotation, range: range)
             }
-            if shouldDrawRomajin, let (romajin, range) = tokenizer.currentRomanjiAnnotation(in: string) {
-                romajinAnnotations.append((romajin as String, range))
-            }
         }
-        textColor?.do { attrString.addAttributes([.foregroundColor: $0], range: attrString.fullRange) }
-        _attrString = attrString
-        return attrString
+        let result: NSMutableAttributedString
+        if drawOriginal {
+            result = attrString
+        } else if shouldDrawRomajin {
+            // 罗马音顶替原文成行，沿用原文的字体名与颜色，只换字号。
+            let romaji = romajinAnnotations.map(\.0).joined(separator: " ")
+            let font = font.map { NSFontManager.shared.convert($0, toSize: romajiFontSize) }
+                ?? .systemFont(ofSize: romajiFontSize)
+            result = NSMutableAttributedString(string: romaji, attributes: [.font: font])
+        } else {
+            result = NSMutableAttributedString(string: "")
+        }
+        textColor?.do { result.addAttributes([.foregroundColor: $0], range: result.fullRange) }
+        _attrString = result
+        return result
     }
 
     private var _ctFrame: CTFrame?
@@ -263,7 +293,8 @@ class KaraokeLabel: NSTextField {
     }
 
     private func drawRomajiAnnotations(in context: CGContext, frame: CTFrame) {
-        guard drawRomajin, !romajinAnnotations.isEmpty else { return }
+        // 内联模式下罗马音已经是正文，不需要再叠一层注释。
+        guard drawRomajin, drawOriginal, !romajinAnnotations.isEmpty else { return }
 
         let lines = frame.lines
         let origins = frame.lineOrigins(range: CFRangeMake(0, lines.count))

@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		0F07BAF52E8A8B2900085912 /* PreferenceSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F07BAF42E8A8B2900085912 /* PreferenceSourceViewController.swift */; };
+		AB53C89E4F184726EC174F20 /* LyricsLayerFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29886BEF039F458B61405424 /* LyricsLayerFont.swift */; };
 		BB03C8891FDF6FC000FBE0DA /* ChineseConverter+Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB03C8881FDF6FC000FBE0DA /* ChineseConverter+Singleton.swift */; };
 		BB063B2E1E8A93C900A25C3E /* KaraokeLyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB063B2D1E8A93C900A25C3E /* KaraokeLyricsView.swift */; };
 		BB0B296A1E7FBA2D00B1D6C9 /* PreferenceFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B29691E7FBA2D00B1D6C9 /* PreferenceFilterViewController.swift */; };
@@ -113,6 +114,7 @@
 
 /* Begin PBXFileReference section */
 		0F07BAF42E8A8B2900085912 /* PreferenceSourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceSourceViewController.swift; sourceTree = "<group>"; };
+		29886BEF039F458B61405424 /* LyricsLayerFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsLayerFont.swift; sourceTree = "<group>"; };
 		BB03C8881FDF6FC000FBE0DA /* ChineseConverter+Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChineseConverter+Singleton.swift"; sourceTree = "<group>"; };
 		BB063B2D1E8A93C900A25C3E /* KaraokeLyricsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KaraokeLyricsView.swift; sourceTree = "<group>"; };
 		BB0B29691E7FBA2D00B1D6C9 /* PreferenceFilterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceFilterViewController.swift; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 				E97593E32150F47800D80616 /* Polyfill.swift */,
 				E97593E52150F6FB00D80616 /* IBInspection.swift */,
 				BB9BCEB91E843157001BC54B /* Extension.swift */,
+				29886BEF039F458B61405424 /* LyricsLayerFont.swift */,
 				BBE2A79724041E36004A7E93 /* CombineExtension.swift */,
 				BB1B300220E878AE002F1AF8 /* StdExtension.swift */,
 				BB1B2FFC20E8780A002F1AF8 /* CFExtension.swift */,
@@ -699,6 +702,7 @@
 				BB0B296A1E7FBA2D00B1D6C9 /* PreferenceFilterViewController.swift in Sources */,
 				0F07BAF52E8A8B2900085912 /* PreferenceSourceViewController.swift in Sources */,
 				BB89089E21ED69410078F522 /* Lyrics+Language.swift in Sources */,
+				AB53C89E4F184726EC174F20 /* LyricsLayerFont.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

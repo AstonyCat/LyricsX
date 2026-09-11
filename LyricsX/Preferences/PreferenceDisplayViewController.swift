@@ -28,10 +28,11 @@ class PreferenceDisplayViewController: PreferenceViewController, FontSelectTextF
     private func setUpLyricsLayerControls() {
         // Karaoke tab (DesktopLyrics*): the only free space is the upper-left
         // quadrant, left of the mode checkboxes and above the "Disable lyrics
-        // when:" label, so this group uses compact rows. Window tab
+        // when:" label. Compact, hard-height rows keep the group's bottom edge
+        // ~13pt above that label even if text metrics grow. Window tab
         // (LyricsWindow*): open space below the highlight color well.
         if let karaokeTabContentView = karaokeFontSelectField.superview {
-            installLyricsLayerControls(keyPrefix: "DesktopLyrics", in: karaokeTabContentView, topInset: 16, leadingInset: 20, compact: true)
+            installLyricsLayerControls(keyPrefix: "DesktopLyrics", in: karaokeTabContentView, topInset: 12, leadingInset: 20, compact: true)
         }
         if let windowTabContentView = hudFontSelectField.superview {
             installLyricsLayerControls(keyPrefix: "LyricsWindow", in: windowTabContentView, topInset: 140, leadingInset: 173, compact: false)
@@ -49,7 +50,7 @@ class PreferenceDisplayViewController: PreferenceViewController, FontSelectTextF
 
     private static func makeLyricsLayerControls(keyPrefix: String, compact: Bool) -> NSStackView {
         let rowHeight: CGFloat = compact ? 20 : 22
-        let rowSpacing: CGFloat = compact ? 2 : 6
+        let rowSpacing: CGFloat = compact ? 1 : 6
 
         let group = NSStackView()
         group.orientation = .vertical
@@ -83,6 +84,13 @@ class PreferenceDisplayViewController: PreferenceViewController, FontSelectTextF
             }
 
             group.addArrangedSubview(row)
+            // Hard-pin row heights so the group's total height is fixed: larger
+            // text metrics must not grow the Karaoke group into the label below
+            // (a taller checkbox simply centers within, and can overflow, its
+            // row instead of pushing rows apart).
+            row.snp.makeConstraints { make in
+                make.height.equalTo(rowHeight)
+            }
         }
 
         return group

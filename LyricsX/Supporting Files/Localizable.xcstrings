@@ -321,6 +321,54 @@
         }
       }
     },
+    "Show furigana" : {
+      "comment" : "Checkbox toggling a lyrics layer on the Display preferences pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show furigana"
+          }
+        }
+      }
+    },
+    "Show original" : {
+      "comment" : "Checkbox toggling a lyrics layer on the Display preferences pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show original"
+          }
+        }
+      }
+    },
+    "Show romaji" : {
+      "comment" : "Checkbox toggling a lyrics layer on the Display preferences pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show romaji"
+          }
+        }
+      }
+    },
+    "Show translation" : {
+      "comment" : "Checkbox toggling a lyrics layer on the Display preferences pane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show translation"
+          }
+        }
+      }
+    },
     "Touch Bar lyrics is not supported in Mac App Store Version. Please download on GitHub." : {
       "localizations" : {
         "ar" : {

@@ -50,7 +50,7 @@ class KaraokeLyricsWindowController: NSWindowController {
                 .receive(on: DispatchQueue.lyricsDisplay)
                 .invoke(KaraokeLyricsWindowController.handleLyricsDisplay, weaklyOn: self)
                 .store(in: &self.cancelBag)
-            defaults.publisher(for: [.preferBilingualLyrics, .desktopLyricsOneLineMode])
+            defaults.publisher(for: [.desktopLyricsShowTranslation, .desktopLyricsOneLineMode])
                 .prepend()
                 .invoke(KaraokeLyricsWindowController.handleLyricsDisplay, weaklyOn: self)
                 .store(in: &self.cancelBag)
@@ -68,8 +68,9 @@ class KaraokeLyricsWindowController: NSWindowController {
         lyricsView.bind(\.shadowColor, withDefaultName: .desktopLyricsShadowColor)
         lyricsView.bind(\.backgroundColor, withDefaultName: .desktopLyricsBackgroundColor)
         lyricsView.bind(\.isVertical, withDefaultName: .desktopLyricsVerticalMode, options: [.nullPlaceholder: false])
-        lyricsView.bind(\.drawFurigana, withDefaultName: .desktopLyricsEnableFurigana, options: [.nullPlaceholder: false])
-        lyricsView.bind(\.drawRomajin, withDefaultName: .desktopLyricsEnableRomajin, options: [.nullPlaceholder: false])
+        lyricsView.bind(\.drawFurigana, withDefaultName: .desktopLyricsShowFurigana, options: [.nullPlaceholder: false])
+        lyricsView.bind(\.drawRomajin, withDefaultName: .desktopLyricsShowRomaji, options: [.nullPlaceholder: false])
+        lyricsView.bind(\.drawOriginal, withDefaultName: .desktopLyricsShowOriginal, options: [.nullPlaceholder: true])
 
         let negateOption = [NSBindingOption.valueTransformerName: NSValueTransformerName.negateBooleanTransformerName]
         window?.contentView?.bind(.hidden, withDefaultName: .desktopLyricsEnabled, options: negateOption)
@@ -87,8 +88,14 @@ class KaraokeLyricsWindowController: NSWindowController {
             .desktopLyricsFontName,
             .desktopLyricsFontSize,
             .desktopLyricsFontNameFallback,
+            .desktopLyricsFuriganaFontSize,
+            .desktopLyricsRomajiFontSize,
+            .desktopLyricsTranslationFontSize,
         ], options: [.initial]) { [unowned self] in
             self.lyricsView.font = defaults.desktopLyricsFont
+            self.lyricsView.translationFont = defaults.desktopLyricsFont(size: defaults.desktopTranslationSize)
+            self.lyricsView.furiganaFontSize = defaults.desktopFuriganaSize
+            self.lyricsView.romajiFontSize = defaults.desktopRomajiSize
         }
 
         observeNotification(name: NSApplication.didChangeScreenParametersNotification, queue: .main) { [unowned self] _ in
@@ -128,7 +135,7 @@ class KaraokeLyricsWindowController: NSWindowController {
         var secondLineIsTranslation = false
         if defaults[.desktopLyricsOneLineMode] {
             secondLine = ""
-        } else if defaults[.preferBilingualLyrics],
+        } else if defaults[.desktopLyricsShowTranslation],
                   let translation = lrc.attachments[.translation(languageCode: languageCode)] {
             secondLine = translation
             secondLineIsTranslation = true
@@ -151,6 +158,7 @@ class KaraokeLyricsWindowController: NSWindowController {
         DispatchQueue.main.async {
             self.lyricsView.displayLrc(firstLine, secondLine: secondLine, secondLineIsTranslation: secondLineIsTranslation)
             if let upperTextField = self.lyricsView.displayLine1,
+               !upperTextField.isDrawingRomajiInline || !upperTextField.hasVisibleContent,
                let timetag = lrc.attachments.timetag {
                 let position = selectedPlayer.playbackTime
                 let timeDelay = AppController.shared.currentLyrics?.adjustedTimeDelay ?? 0

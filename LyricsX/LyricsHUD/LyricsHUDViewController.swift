@@ -46,12 +46,26 @@ class LyricsHUDViewController: NSViewController, NSWindowDelegate, ScrollLyricsV
         lyricsScrollView.bind(\.fontSize, withUnmatchedDefaultName: .lyricsWindowFontSize)
         lyricsScrollView.bind(\.textColor, withDefaultName: .lyricsWindowTextColor)
         lyricsScrollView.bind(\.highlightColor, withDefaultName: .lyricsWindowHighlightColor)
+        lyricsScrollView.bind(\.showFurigana, withDefaultName: .lyricsWindowShowFurigana, options: [.nullPlaceholder: false])
+        lyricsScrollView.bind(\.showOriginal, withDefaultName: .lyricsWindowShowOriginal, options: [.nullPlaceholder: true])
+        lyricsScrollView.bind(\.showRomaji, withDefaultName: .lyricsWindowShowRomaji, options: [.nullPlaceholder: false])
+        lyricsScrollView.bind(\.showTranslation, withDefaultName: .lyricsWindowShowTranslation, options: [.nullPlaceholder: true])
 
         observeDefaults(key: .lyricsWindowFontSize, options: [.new, .initial]) { [unowned self] _, change in
             let fontSize = CGFloat(change.newValue)
             self.lyricsScrollViewTopMargin.constant = fontSize
             self.lyricsScrollViewLeftMargin.constant = fontSize
             self.displayLyrics(animation: false)
+        }
+
+        observeDefaults(keys: [
+            .lyricsWindowFuriganaFontSize,
+            .lyricsWindowRomajiFontSize,
+            .lyricsWindowTranslationFontSize,
+        ], options: [.initial]) { [unowned self] in
+            self.lyricsScrollView.furiganaFontSize = defaults.windowFuriganaSize
+            self.lyricsScrollView.romajiFontSize = defaults.windowRomajiSize
+            self.lyricsScrollView.translationFontSize = defaults.windowTranslationSize
         }
 
         AppController.shared.$currentLyrics

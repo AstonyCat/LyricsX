@@ -52,6 +52,9 @@ class KaraokeLabel: NSTextField {
         !drawOriginal && drawRomajin
     }
 
+    /// 该 label 当前承载的是翻译还是原文，决定用哪个字号。
+    var isTranslationLine = false
+
     /// 四层全关时没有任何可绘制内容，视图层据此整体隐藏。
     var hasVisibleContent: Bool {
         drawOriginal || (drawRomajin && !romajinAnnotations.isEmpty)

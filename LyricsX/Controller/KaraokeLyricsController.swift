@@ -149,7 +149,7 @@ class KaraokeLyricsWindowController: NSWindowController {
         }
 
         DispatchQueue.main.async {
-            self.lyricsView.displayLrc(firstLine, secondLine: secondLine)
+            self.lyricsView.displayLrc(firstLine, secondLine: secondLine, secondLineIsTranslation: secondLineIsTranslation)
             if let upperTextField = self.lyricsView.displayLine1,
                let timetag = lrc.attachments.timetag {
                 let position = selectedPlayer.playbackTime

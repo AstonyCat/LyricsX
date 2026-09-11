@@ -15,8 +15,20 @@ class KaraokeLyricsView: NSView {
 
     @objc dynamic var drawFurigana = false
     @objc dynamic var drawRomajin = false
+    @objc dynamic var drawOriginal = true
+    @objc dynamic var furiganaFontSize: CGFloat = 12
+    @objc dynamic var romajiFontSize: CGFloat = 8
 
-    @objc dynamic var font = NSFont.labelFont(ofSize: 24) { didSet { updateFontSize() } }
+    @objc dynamic var font = NSFont.labelFont(ofSize: 24) {
+        didSet {
+            updateFontSize()
+            refreshLabelFonts()
+        }
+    }
+
+    @objc dynamic var translationFont = NSFont.labelFont(ofSize: 19) {
+        didSet { refreshLabelFonts() }
+    }
     @objc dynamic var textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
     @objc dynamic var shadowColor = #colorLiteral(red: 0, green: 1, blue: 0.8333333333, alpha: 1)
     @objc dynamic var progressColor = #colorLiteral(red: 0, green: 1, blue: 0.8333333333, alpha: 1)
@@ -67,27 +79,40 @@ class KaraokeLyricsView: NSView {
         backgroundView.layer?.cornerRadius = font.pointSize / 2
     }
 
-    private func lyricsLabel(_ content: String) -> KaraokeLabel {
+    /// 字号偏好变化时把在场的 label 按角色刷一遍，否则当前那句不会更新。
+    private func refreshLabelFonts() {
+        for label in stackView.arrangedSubviews.compactMap({ $0 as? KaraokeLabel }) {
+            label.font = label.isTranslationLine ? translationFont : font
+        }
+    }
+
+    private func lyricsLabel(_ content: String, isTranslation: Bool) -> KaraokeLabel {
         if let view = stackView.subviews.lazy.compactMap({ $0 as? KaraokeLabel }).first(where: { !stackView.arrangedSubviews.contains($0) }) {
             view.alphaValue = 0
             view.stringValue = content
             view.removeProgressAnimation()
             view.removeFromSuperview()
+            view.isTranslationLine = isTranslation
+            view.font = isTranslation ? translationFont : font
             return view
         }
         return KaraokeLabel(labelWithString: content).then {
-            $0.bind(\.font, to: self, withKeyPath: \.font)
+            $0.isTranslationLine = isTranslation
+            $0.font = isTranslation ? translationFont : font
             $0.bind(\.textColor, to: self, withKeyPath: \.textColor)
             $0.bind(\.progressColor, to: self, withKeyPath: \.progressColor)
             $0.bind(\._shadowColor, to: self, withKeyPath: \.shadowColor)
             $0.bind(\.isVertical, to: self, withKeyPath: \.isVertical)
             $0.bind(\.drawFurigana, to: self, withKeyPath: \.drawFurigana)
             $0.bind(\.drawRomajin, to: self, withKeyPath: \.drawRomajin)
+            $0.bind(\.drawOriginal, to: self, withKeyPath: \.drawOriginal)
+            $0.bind(\.furiganaFontSize, to: self, withKeyPath: \.furiganaFontSize)
+            $0.bind(\.romajiFontSize, to: self, withKeyPath: \.romajiFontSize)
             $0.alphaValue = 0
         }
     }
 
-    func displayLrc(_ firstLine: String, secondLine: String = "") {
+    func displayLrc(_ firstLine: String, secondLine: String = "", secondLineIsTranslation: Bool = false) {
         var toBeHide = stackView.arrangedSubviews.compactMap { $0 as? KaraokeLabel }
         var toBeShow: [NSTextField] = []
         var shouldHideAll = false
@@ -100,13 +125,13 @@ class KaraokeLyricsView: NSView {
             displayLine1 = toBeHide[index]
             toBeHide.remove(at: index)
         } else {
-            let label = lyricsLabel(firstLine)
+            let label = lyricsLabel(firstLine, isTranslation: false)
             displayLine1 = label
             toBeShow.append(label)
         }
 
         if !secondLine.trimmingCharacters(in: .whitespaces).isEmpty {
-            let label = lyricsLabel(secondLine)
+            let label = lyricsLabel(secondLine, isTranslation: secondLineIsTranslation)
             displayLine2 = label
             toBeShow.append(label)
         } else {

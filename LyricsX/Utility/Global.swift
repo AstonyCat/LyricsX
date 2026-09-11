@@ -113,6 +113,24 @@ extension UserDefaults.DefaultsKeys {
     static let desktopLyricsEnableFurigana = Key<Bool>("DesktopLyricsEnableFurigana")
     static let desktopLyricsEnableRomajin = Key<Bool>("DesktopLyricsEnableRomajin")
 
+    static let desktopLyricsShowFurigana = Key<Bool>("DesktopLyricsShowFurigana")
+    static let desktopLyricsShowOriginal = Key<Bool>("DesktopLyricsShowOriginal")
+    static let desktopLyricsShowRomaji = Key<Bool>("DesktopLyricsShowRomaji")
+    static let desktopLyricsShowTranslation = Key<Bool>("DesktopLyricsShowTranslation")
+
+    static let desktopLyricsFuriganaFontSize = Key<Int>("DesktopLyricsFuriganaFontSize")
+    static let desktopLyricsRomajiFontSize = Key<Int>("DesktopLyricsRomajiFontSize")
+    static let desktopLyricsTranslationFontSize = Key<Int>("DesktopLyricsTranslationFontSize")
+
+    static let lyricsWindowShowFurigana = Key<Bool>("LyricsWindowShowFurigana")
+    static let lyricsWindowShowOriginal = Key<Bool>("LyricsWindowShowOriginal")
+    static let lyricsWindowShowRomaji = Key<Bool>("LyricsWindowShowRomaji")
+    static let lyricsWindowShowTranslation = Key<Bool>("LyricsWindowShowTranslation")
+
+    static let lyricsWindowFuriganaFontSize = Key<Int>("LyricsWindowFuriganaFontSize")
+    static let lyricsWindowRomajiFontSize = Key<Int>("LyricsWindowRomajiFontSize")
+    static let lyricsWindowTranslationFontSize = Key<Int>("LyricsWindowTranslationFontSize")
+
     static let desktopLyricsFontName = Key<String>("DesktopLyricsFontName")
     static let desktopLyricsFontSize = Key<Int>("DesktopLyricsFontSize")
     static let desktopLyricsFontNameFallback = Key<[String]>("DesktopLyricsFontNameFallback")

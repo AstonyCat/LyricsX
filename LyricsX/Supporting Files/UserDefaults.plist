@@ -16,6 +16,34 @@
 	<integer>20</integer>
 	<key>DesktopLyricsEnableFurigana</key>
 	<false/>
+	<key>DesktopLyricsShowFurigana</key>
+	<false/>
+	<key>DesktopLyricsShowOriginal</key>
+	<true/>
+	<key>DesktopLyricsShowRomaji</key>
+	<false/>
+	<key>DesktopLyricsShowTranslation</key>
+	<true/>
+	<key>DesktopLyricsFuriganaFontSize</key>
+	<integer>12</integer>
+	<key>DesktopLyricsRomajiFontSize</key>
+	<integer>8</integer>
+	<key>DesktopLyricsTranslationFontSize</key>
+	<integer>19</integer>
+	<key>LyricsWindowShowFurigana</key>
+	<false/>
+	<key>LyricsWindowShowOriginal</key>
+	<true/>
+	<key>LyricsWindowShowRomaji</key>
+	<false/>
+	<key>LyricsWindowShowTranslation</key>
+	<true/>
+	<key>LyricsWindowFuriganaFontSize</key>
+	<integer>9</integer>
+	<key>LyricsWindowRomajiFontSize</key>
+	<integer>7</integer>
+	<key>LyricsWindowTranslationFontSize</key>
+	<integer>11</integer>
 	<key>DesktopLyricsFontName</key>
 	<string>Optima-Regular</string>
 	<key>DesktopLyricsFontSize</key>
@@ -23,7 +51,7 @@
 	<key>LyricsWindowFontName</key>
 	<string>Helvetica</string>
 	<key>LyricsWindowFontSize</key>
-	<string>13</string>
+	<integer>13</integer>
 	<key>LyricsFilterEnabled</key>
 	<true/>
 	<key>LyricsSmartFilterEnabled</key>
